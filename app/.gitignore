@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+models/
+recordings/
+
+# Installer and build artifacts
+build/
+dist/
+*.spec
+Output/
+*.exe
+
+# Inno Setup script output
+*.iss~
+
+# OS-specific files
+.DS_Store
+Thumbs.db
