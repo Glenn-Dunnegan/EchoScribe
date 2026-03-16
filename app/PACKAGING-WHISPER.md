@@ -1,49 +1,43 @@
 # PyInstaller Packaging for EchoScribe (Whisper)
 
-## 1. Ensure All Dependencies Are Installed
-
-```powershell
-pip install -r requirements-whisper.txt
-```
-
-## 2. Pre-download the Whisper "base" Model (Recommended)
-
-Run the app once to trigger model download, or manually download the model and place it in the `models/base` directory:
-
-```powershell
-python main.py
-# Or manually download and unzip the model to app/models/base
-```
-
-## 3. PyInstaller Command (with Data Files)
+## 1. Install Dependencies
 
 Run this from the `app` directory:
 
 ```powershell
-pyinstaller --onefile --windowed --icon=echoscribe.ico \
-  --add-data "models;base" \
-  --add-data "recordings;recordings" \
-  --hidden-import=faster_whisper \
-  --hidden-import=soundfile \
-  --hidden-import=numpy \
-  --hidden-import=ctranslate2 \
-  main.py
+pip install -r requirements-whisper.txt
+pip install pyinstaller
 ```
 
-- `--add-data "models;base"` ensures the Whisper model is bundled (if present).
-- Add any other required data folders as needed.
-- If you use a virtual environment, you may need to specify the full path to `pyinstaller`.
+## 2. Build the App (One-Folder)
 
-## 4. Distribute the .exe
+Use the maintained spec file:
 
-- The generated .exe will work offline if the `models/base` folder is bundled.
-- If the model is not bundled, the app will attempt to download it on first run (requires internet).
+```powershell
+pyinstaller --clean main.spec
+```
 
-## 5. Troubleshooting
+Output folder:
 
-- If you see missing DLL or import errors, add more `--hidden-import` flags for any missing modules.
-- For large models, the .exe size will increase. You can distribute the model folder separately if needed.
+- `dist/main/`
 
----
+## 3. Build the Windows Installer (Inno Setup)
 
-For further help, see the README or ask for packaging troubleshooting tips.
+Compile `EchoScribeInstaller.iss` with Inno Setup Compiler.
+
+The installer script now packages `dist/main/*` so the full app runtime is included.
+
+## 4. Installer Behavior Notes
+
+- App binaries install under `Program Files`.
+- Writable app data is stored under `%LOCALAPPDATA%\EchoScribe`:
+  - `%LOCALAPPDATA%\EchoScribe\models`
+  - `%LOCALAPPDATA%\EchoScribe\recordings`
+- If a model exists in bundled `models/<name>`, the app copies it to user data on first use.
+
+## 5. Shareable Release Checklist
+
+- Build on a clean virtual environment.
+- Run installer on a clean machine/user profile.
+- Verify: launch, microphone capture, transcription, model availability, and uninstall flow.
+- If distributing publicly, code-sign both `main.exe` and the installer executable.

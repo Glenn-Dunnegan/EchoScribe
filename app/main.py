@@ -15,7 +15,7 @@ from pynput import keyboard as pynput_keyboard
 
 from echoscribe.audio import Recorder
 from echoscribe.config import AUDIO_DTYPE, CHANNELS, DEFAULT_MODEL_NAME, SAMPLE_RATE
-from echoscribe.model_manager import download_model, get_model_path, model_exists
+from echoscribe.model_manager import download_model, model_exists, resolve_model_path
 from echoscribe.transcribe import transcribe_wav
 
 
@@ -190,7 +190,7 @@ class EchoScribeApp:
 
     def download_model(self) -> None:
         def worker() -> None:
-            model_name = self.model_name.get().strip()
+            model_name = self.whisper_model_size.get().strip()
             if not model_name:
                 self.root.after(0, lambda: messagebox.showerror("Error", "Model name cannot be empty."))
                 return
@@ -448,8 +448,8 @@ class EchoScribeApp:
         if self._live_stream is not None:
             return
 
-        model_name = self.model_name.get().strip()
-        model_path = get_model_path(model_name)
+        model_name = self.whisper_model_size.get().strip()
+        model_path = resolve_model_path(model_name)
         if not model_exists(model_name):
             messagebox.showwarning("Missing model", f"Download model first: {model_name}")
             return
