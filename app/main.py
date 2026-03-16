@@ -517,13 +517,17 @@ class EchoScribeApp:
 
 
         whisper_size = self.whisper_model_size.get()
+        model_path = resolve_model_path(whisper_size)
+        if not model_exists(whisper_size):
+            messagebox.showwarning("Missing model", f"Download model first: {whisper_size}")
+            return
+
         keep_recordings = self.keep_recordings.get()
         last_recording_path = self.last_recording
         def worker() -> None:
             self.root.after(0, lambda: self.set_status("Transcribing..."))
             try:
-                from echoscribe.whisper_transcribe import transcribe_wav_whisper
-                transcript = transcribe_wav_whisper(str(last_recording_path), model_size=whisper_size, device="cpu")
+                transcript = transcribe_wav(last_recording_path, model_path=model_path)
                 # If auto-type is enabled, only type into focused app and skip updating EchoScribe's text box
                 if transcript and self.auto_type_to_focused.get():
                     def type_worker():

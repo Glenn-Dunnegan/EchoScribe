@@ -1,5 +1,4 @@
 faster-whisper
-soundfile
 sounddevice
 numpy
 requests
